@@ -12,7 +12,6 @@ describe('Button component', () => {
 
   it('renders without errors', () => {
     const { queryByTestId } = render(<Button type="button">Click Me</Button>)
-    console.log(queryByTestId('button'))
     expect(queryByTestId('button')).toBeInTheDocument()
   })
 
@@ -105,58 +104,39 @@ describe('Button component', () => {
   })
 
   it('accepts additional custom class names', () => {
-    const { getByTestId } = render(
+    const { queryByTestId } = render(
       <Button className="customClass" type="button">
         Click Me
       </Button>
     )
-    expect(getByTestId('button')).toHaveClass('usa-button')
-    expect(getByTestId('button')).toHaveClass('customClass')
+    expect(queryByTestId('button')).toHaveClass('usa-button')
+    expect(queryByTestId('button')).toHaveClass('customClass')
   })
 
-  it('renders button as a different component', () => {
-    interface MockLinkProps {
-      to: string
-      children: React.ReactNode
-    }
+  describe('with custom component', () => {
+    it('renders expected parent element', () => {
+      const { container } = render(
+        <Button as={<a href="https://truss.works"> Visit Truss</a>}>
+          Visit Truss
+        </Button>
+      )
 
-    const MockLink = ({ to, children }: MockLinkProps): React.ReactElement => (
-      <a href={to}>{children}</a>
-    )
+      expect(container.querySelector('a')).toBeInTheDocument()
+      expect(container.querySelector('button')).not.toBeInTheDocument()
+    })
 
-    const { getByTestId, container } = render(
-      <Button as={MockLink} to="https://truss.works">
-        <div data-testid="button-child" />
-      </Button>
-    )
+    it('applies uswds Button props', () => {
+      const { queryByTestId } = render(
+        <Button
+          as={<a href="https://truss.works">Visit Truss</a>}
+          size="big"
+          base>
+          Visit Truss
+        </Button>
+      )
 
-    expect(container.querySelector('a')).toBeInTheDocument()
-    expect(getByTestId('button-child')).toBeTruthy()
-  })
-
-  it('renders button as different element', () => {
-    const { container } = render(
-      <Button as="a" href="https://truss.works">
-        Click Me
-      </Button>
-    )
-
-    expect(container.querySelector('a')).toBeInTheDocument()
-  })
-
-  it('renders additional props', () => {
-    const { getByTestId } = render(
-      <Button
-        as="a"
-        href="https://truss.works"
-        target="_blank"
-        rel="noopener noreferrer">
-        Click Me
-      </Button>
-    )
-
-    expect(getByTestId('button')).toHaveAttribute('href', 'https://truss.works')
-    expect(getByTestId('button')).toHaveAttribute('target', '_blank')
-    expect(getByTestId('button')).toHaveAttribute('rel', 'noopener noreferrer')
+      expect(queryByTestId('button')).toHaveClass('usa-button--big')
+      expect(queryByTestId('button')).toHaveClass('usa-button--base')
+    })
   })
 })

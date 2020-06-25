@@ -2,8 +2,7 @@ import React, { FunctionComponent, ComponentClass } from 'react'
 import classnames from 'classnames'
 import { deprecationWarning } from '../../deprecation'
 
-interface ButtonProps {
-  as?: FunctionComponent<any> | ComponentClass<any> | string
+interface BaseButtonProps {
   children: React.ReactNode
   secondary?: boolean
   base?: boolean
@@ -21,14 +20,28 @@ interface ButtonProps {
   small?: boolean
   icon?: boolean
   unstyled?: boolean
-  [x: string]: any
 }
 
-export const Button = (
-  props: ButtonProps & React.HTMLAttributes<HTMLButtonElement>
-): React.ReactElement => {
+type ButtonTagProps = BaseButtonProps &
+  JSX.IntrinsicElements['button'] & {
+    type: 'button' | 'submit' | 'reset'
+  }
+
+type CustomComponentProps = BaseButtonProps &
+  React.HTMLAttributes<HTMLElement> & {
+    as: React.ReactElement
+  }
+
+type ButtonProps = CustomComponentProps | ButtonTagProps // Order matters here, the last is default for type suggestions
+
+const isCustomComponent = (
+  props: ButtonProps
+): props is CustomComponentProps => {
+  return (props as CustomComponentProps).as !== undefined
+}
+
+export const Button = (props: ButtonProps): React.ReactElement => {
   const {
-    as,
     children,
     secondary,
     base,
@@ -70,14 +83,16 @@ export const Button = (
     className
   )
 
-  return React.createElement(
-    as || 'button',
-    {
-      ...restProps,
-      'data-testid': 'button',
-      className: classes,
-    },
-    children
+  const updatedButtonProps = {
+    'data-testid': 'button',
+    ...restProps,
+    className: classes,
+  }
+
+  return isCustomComponent(props) ? (
+    React.cloneElement(props.as, updatedButtonProps, children)
+  ) : (
+    <button {...updatedButtonProps}>{children}</button>
   )
 }
 

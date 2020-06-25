@@ -76,28 +76,11 @@ export const customClass = (): React.ReactElement => (
   </Button>
 )
 
-export const asAnchorTag = (): React.ReactElement => (
-  <Button
-    as="a"
-    href="https://truss.works"
-    target="_blank"
-    rel="noopener noreferrer">
-    Visit Truss
-  </Button>
-)
-
 export const asCustomComponent = (): React.ReactElement => {
-  interface MockLinkProps {
-    to: string
-    children: React.ReactNode
-  }
-
-  const CustomLink = ({ to, children }: MockLinkProps): React.ReactElement => (
-    <a href={to}>{children}</a>
-  )
+  const MockButton = <a href="https://truss.works">Visit Truss</a>
 
   return (
-    <Button as={CustomLink} to="https://truss.works">
+    <Button as={MockButton} base>
       Visit Truss
     </Button>
   )
